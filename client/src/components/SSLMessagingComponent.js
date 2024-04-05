@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './SSLMessagingComponent.css';
 
 function SSLMessagingComponent() {
     const [message, setMessage] = useState('');
@@ -9,7 +10,7 @@ function SSLMessagingComponent() {
         const webSocket = new WebSocket('wss://localhost:8080');
 
         webSocket.onmessage = (event) => {
-            setReceivedMessages((prevMessages) => [...prevMessages, { content: event.data, timestamp: new Date().toLocaleTimeString() }]);
+            setReceivedMessages((prevMessages) => [...prevMessages, { content: event.data, timestamp: new Date().toLocaleTimeString(), sent: false }]);
         };
 
         webSocket.onopen = () => {
@@ -36,15 +37,10 @@ function SSLMessagingComponent() {
     const sendMessage = () => {
         if (ws && message) {
             ws.send(message);
-            setMessage(''); // Clear the message input after sending
+            setMessage('');
+            setReceivedMessages((prevMessages) => [...prevMessages, { content: message, timestamp: new Date().toLocaleTimeString(), sent: true }]);
         }
     };
-
-    // Example of using determineSenderClass function, can be modified according to actual logic
-    function determineSenderClass(msg) {
-        // Placeholder logic to determine message sender class
-        return 'sent'; // Or 'received' based on the condition
-    }
 
     return (
         <div className="ssl-messaging-container">
@@ -53,7 +49,7 @@ function SSLMessagingComponent() {
             </div>
             <div className="messages-area">
                 {receivedMessages.map((msg, index) => (
-                    <div key={index} className={`message ${determineSenderClass(msg)}`}>
+                    <div key={index} className={`message ${msg.sent ? 'sent' : 'received'}`}>
                         <span className="message-text">{msg.content}</span>
                         <span className="message-timestamp">{msg.timestamp}</span>
                     </div>
