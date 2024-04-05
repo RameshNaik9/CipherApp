@@ -12,39 +12,39 @@ Setup and Installation:
    cd your-repo-name
 
 2. Install Dependencies:
+
    Navigate to the project directory and then server
-
-   npm install
-
-This command will install all necessary dependencies listed in package.json.
 
 Running the Server:
 
 1. Navigate to the server directory.
 
-cd server
+### `cd server`
 
 2. Install server dependencies:
 
-npm install
+### `npm install`
+
+This command will install all necessary dependencies listed in package.json.
 
 3. Start the development server:
 
-nodemon server.js
+### `nodemon server.js`
 
 By default, the server will run on http://localhost:5000.
 
 open another terminal
+
 Running the Client:
 
 1. Navigate to the client directory.
 
-cd client
+### `cd client`
 
 2. Install client dependencies:
 
-npm install
+### `npm install`
 
 3. Start the React development server:
 
-npm start
+### `npm start`
