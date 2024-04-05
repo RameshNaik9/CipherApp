@@ -1,0 +1,25 @@
+# Node.js
+node_modules/
+
+# Environment variables
+# server/.env
+
+# Certificates
+server/*.pem
+
+# Dependency directories
+**/node_modules/
+
+# Optional: MacOS system files
+.DS_Store
+
+# Optional: Windows system files
+Thumbs.db
+ehthumbs.db
+
+# Optional: Linux system files
+.*~
+
+# Other files that may contain sensitive information or build artifacts
+server/package-lock.json
+client/package-lock.json

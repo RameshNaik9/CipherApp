@@ -1,0 +1,21 @@
+.symmetric-cipher-selector {
+    text-align: center;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+.symmetric-cipher-selector select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Reuse the styles from the AESCipher component as needed */
