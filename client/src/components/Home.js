@@ -5,13 +5,8 @@ import RSACipher from './RSACipher';
 import MessageDigest from './MessageDigest';
 import DigitalSignature from './DigitalSignature';
 import Base64Component from './Base64Component';
-// import SymmetricCipherComponent from './SymmetricCipherComponent';
-import SSLMessagingComponent from './SSLMessagingComponent';
 import SymmetricCipherSelector from './SymmetricCipherSelector';
-
-
-
-
+import MessagingComponent from './MessagingComponent';
 
 function Home({ onCipherSelection }) {
   const [selectedCipher, setSelectedCipher] = useState('');
@@ -35,9 +30,7 @@ function Home({ onCipherSelection }) {
       case 'base64':
         return <Base64Component />;
       case 'ssl':
-        return <SSLMessagingComponent />;
-      // case 'symmetric':
-      //   return <SymmetricCipherComponent />;
+        return <MessagingComponent />;
       case 'symmetric':
         return <SymmetricCipherSelector />;
       default:

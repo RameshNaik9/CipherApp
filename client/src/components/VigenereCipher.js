@@ -8,12 +8,10 @@ function VigenereCipher() {
     const [mode, setMode] = useState('encrypt');
 
     const handleEncrypt = () => {
-        // Implement Vigenere cipher encryption logic here
         setResult('Encrypted text will go here');
     };
 
     const handleDecrypt = () => {
-        // Implement Vigenere cipher decryption logic here
         setResult('Decrypted text will go here');
     };
 

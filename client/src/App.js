@@ -7,6 +7,8 @@ import RSACipher from './components/RSACipher';
 import MessageDigest from './components/MessageDigest'; 
 import Signup from './components/Signup'; 
 import Header from './components/Header.js';
+import LoginAdmin from './components/LoginAdmin';
+import AdminHome from './components/AdminHome'; 
 
 
 function App() {
@@ -43,6 +45,17 @@ function App() {
             <Signup />
           </div>
           } /> 
+          <Route path="/admin-login" element={
+        <div>
+          <Header />
+          <LoginAdmin />
+        </div>} /> 
+          <Route path="/admin-home" element={
+          <div>
+            <Header />
+            <Home onCipherSelection={handleCipherSelection} />
+            <AdminHome />
+          </div>} />
           <Route path="/home" element={
           <div>
             <Header />

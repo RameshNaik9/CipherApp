@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './CipherComponent.css'; // Assuming you have a generic Cipher CSS
+import './CipherComponent.css';
 
 function CaesarCipher() {
   const [text, setText] = useState('');
@@ -8,19 +8,15 @@ function CaesarCipher() {
   const [mode, setMode] = useState('encrypt');
 
   const handleEncrypt = () => {
-    // Implement Caesar cipher encryption logic here
     const encryptedText = text.split('').map(char => {
-        // Encryption logic goes here
-        return char; // Placeholder
+        return char; 
     }).join('');
     setResult(encryptedText);
   };
 
   const handleDecrypt = () => {
-    // Implement Caesar cipher decryption logic here
     const decryptedText = text.split('').map(char => {
-        // Decryption logic goes here
-        return char; // Placeholder
+        return char; 
     }).join('');
     setResult(decryptedText);
   };
@@ -40,7 +36,7 @@ function CaesarCipher() {
 
   const handleModeSwitch = () => {
     setMode(mode === 'encrypt' ? 'decrypt' : 'encrypt');
-    handleReset(); // Optionally reset text and result when switching modes
+    handleReset();
   };
 
   return (

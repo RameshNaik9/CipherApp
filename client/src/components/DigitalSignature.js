@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import './DigitalSignature.css'; // Assume you create a similar CSS file
-
+import './DigitalSignature.css';
 function DigitalSignature() {
   const [message, setMessage] = useState('');
   const [signature, setSignature] = useState('');
@@ -33,7 +32,7 @@ function DigitalSignature() {
   };
 
   const handleKeyGeneration = async () => {
-    const response = await fetch('http://localhost:5000/generate-keys'); // Reusing RSA key generation
+    const response = await fetch('http://localhost:5000/generate-keys');
     const keys = await response.json();
     setPublicKey(keys.publicKey);
     setPrivateKey(keys.privateKey);

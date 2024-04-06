@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './MessageDigest.css'; // You can create a CSS file similar to AESCipher.css or RSACipher.css
+import './MessageDigest.css'; 
 
 function MessageDigest() {
   const [text, setText] = useState('');

@@ -177,27 +177,60 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/admin-login', (req, res) => {
+    const { username, password } = req.body;
+    const filePath = path.join(__dirname, 'admins_data.json');
 
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
 
-// const https = require('https');
-// const WebSocket = require('ws');
-// const server = https.createServer({
-//   cert: fs.readFileSync('cert.pem'),
-//   key: fs.readFileSync('key.pem')
-// });
-// const wss = new WebSocket.Server({ server });
+        const admins = JSON.parse(data.toString());
+        const admin = admins.find(a => a.username === username);
 
-// wss.on('connection', function connection(ws) {
-//   ws.on('message', function incoming(message) {
-//     console.log('received: %s', message);
-//     ws.send(`Hello, you sent -> ${message}`);
-//   });
-//   ws.send('Welcome to the secure WebSocket server!');
-// });
+        if (!admin || admin.password !== password) {
+            return res.status(401).json({ error: 'Invalid admin username or password' });
+        }
 
-// server.listen(8080, () => {
-//   console.log(`WebSocket server started on port 8080`);
-// });
+        res.json({ message: 'Admin authenticated', authenticated: true });
+    });
+});
+
+app.get('/users', (req, res) => {
+    const filePath = path.join(__dirname, 'users_data.json');
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        res.json(JSON.parse(data.toString()));
+    });
+});
+
+app.delete('/users/:userId', (req, res) => {
+    const { userId } = req.params;
+    const filePath = path.join(__dirname, 'users_data.json');
+
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        let users = JSON.parse(data.toString());
+        users = users.filter(user => user.id !== parseInt(userId, 10));
+
+        fs.writeFile(filePath, JSON.stringify(users, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing file:', err);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            res.status(200).json({ message: 'User deleted successfully' });
+        });
+    });
+});
 
 
 // Caesar Cipher Helper Functions
@@ -238,24 +271,20 @@ app.post('/caesar-decrypt', (req, res) => {
 
 // Placeholder for Playfair Cipher logic
 function playfairEncrypt(text, key) {
-    // Implement Playfair encryption algorithm
-    return text; // Replace with the actual encrypted text
+    return text; 
 }
 
 function playfairDecrypt(cipherText, key) {
-    // Implement Playfair decryption algorithm
-    return cipherText; // Replace with the actual decrypted text
+    return cipherText;
 }
 
 // Placeholder for Vigenère Cipher logic
 function vigenereEncrypt(text, key) {
-    // Implement Vigenère encryption algorithm
-    return text; // Replace with the actual encrypted text
+    return text;
 }
 
 function vigenereDecrypt(cipherText, key) {
-    // Implement Vigenère decryption algorithm
-    return cipherText; // Replace with the actual decrypted text
+    return cipherText; 
 }
 
 // Express endpoints for Playfair Cipher
@@ -283,63 +312,4 @@ app.post('/vigenere-decrypt', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-// // server.js
-// // const express = require('express');
-// // const fs = require('fs');
-// const https = require('https');
-// const WebSocket = require('ws');
-// // const app = express();
-
-// const server = https.createServer({
-//   cert: fs.readFileSync('./cert.pem'), // Your SSL certificate
-//   key: fs.readFileSync('./key.pem')    // Your SSL key
-// }, app);
-
-// const wss = new WebSocket.Server({ server });
-
-// wss.on('connection', function connection(ws) {
-//   console.log('A new client connected.');
-
-//   ws.on('message', function incoming(message) {
-//     console.log('received: %s', message);
-
-//     // Broadcast incoming message to all clients
-//     wss.clients.forEach(function each(client) {
-//       if (client !== ws && client.readyState === WebSocket.OPEN) {
-//         client.send(message);
-//       }
-//     });
-//   });
-// });
-
-// server.listen(8080, () => {
-//   console.log('Listening on https://localhost:8080');
-// });
-
-
-
-const https = require('https');
-const WebSocket = require('ws');
-
-const server = https.createServer({
-  cert: fs.readFileSync('./cert.pem'),
-  key: fs.readFileSync('./key.pem')
-});
-
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', function connection(ws) {
-  console.log('A client connected');
-
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
-  });
-
-  ws.send('Hello Client');
-});
-
-server.listen(8080, () => {
-  console.log('WebSocket server started on wss://localhost:8080');
 });

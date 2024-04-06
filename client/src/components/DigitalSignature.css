@@ -6,7 +6,6 @@
     border-radius: 4px;
     width: 100%;
     max-width: 600px;
-    /* Adjust based on your layout */
     box-sizing: border-box;
 }
 
@@ -17,7 +16,6 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     height: 40px;
-    /* Adjust height as needed */
 }
 
 .digital-signature button {
@@ -52,10 +50,8 @@
     word-wrap: break-word;
 }
 
-/* Responsive adjustments */
 @media (max-width: 600px) {
     .digital-signature {
         width: calc(100% - 40px);
-        /* Considering the padding */
     }
 }
