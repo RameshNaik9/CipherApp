@@ -1,4 +1,28 @@
-Cipher App Setup Instructions
+# Cipher App
+
+## Hosted Domain
+
+The application is hosted at: [https://my-cipher-application.vercel.app/](https://my-cipher-application.vercel.app/)
+
+## Access Information
+
+### Demo Login
+
+Signing up of new users is currently disabled. Use the following credentials for demo purposes:
+
+- **Username:** dhoni
+- **Password:** dhoni
+
+### Admin Login
+
+For administrative access:
+
+- **Username:** admin
+- **Password:** admin
+
+## Local Setup Instructions
+
+To set up the Cipher App locally, follow these steps:
 
 Prerequisites:
 
@@ -30,6 +54,10 @@ This command will install all necessary dependencies listed in package.json.
 3. Start the development server:
 
 ### `nodemon server.js`
+
+4. Start the development server 2:
+
+### `nodemon SSLserver.js`
 
 By default, the server will run on http://localhost:5000.
 
