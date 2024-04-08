@@ -7,60 +7,60 @@ function CaesarCipher() {
   const [result, setResult] = useState('');
   const [mode, setMode] = useState('encrypt');
 
-  const handleEncrypt = () => {
-    const encryptedText = text.split('').map(char => {
-        return char; 
-    }).join('');
-    setResult(encryptedText);
-  };
+  const handleAction = async () => {
+    const url = `http://localhost:5000/caesar-${mode}`;
+    const dataToSend = { text, shift: parseInt(shift, 10) };
 
-  const handleDecrypt = () => {
-    const decryptedText = text.split('').map(char => {
-        return char; 
-    }).join('');
-    setResult(decryptedText);
-  };
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
 
-  const handleAction = () => {
-    if (mode === 'encrypt') {
-      handleEncrypt();
-    } else {
-      handleDecrypt();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResult(data.cipherText || data.plainText);
+    } catch (error) {
+      console.error('Error during the encryption/decryption process:', error);
+      setResult('');
     }
   };
 
   const handleReset = () => {
     setText('');
+    setShift(0);
     setResult('');
-  };
-
-  const handleModeSwitch = () => {
-    setMode(mode === 'encrypt' ? 'decrypt' : 'encrypt');
-    handleReset();
   };
 
   return (
     <div className="cipher-container">
-      <h2>Caesar Cipher</h2>
-      <textarea
+      <h2>{mode === 'encrypt' ? 'Caesar Encryption' : 'Caesar Decryption'}</h2>
+      <input
         placeholder={mode === 'encrypt' ? 'Enter plain text' : 'Enter cipher text'}
         value={text}
         onChange={(e) => setText(e.target.value)}
-      />
+      ></input>
       <input
         type="number"
+        placeholder="Shift number"
         value={shift}
-        onChange={(e) => setShift(parseInt(e.target.value, 10))}
-        placeholder="Shift"
+        onChange={(e) => setShift(e.target.value)}
       />
       <button onClick={handleAction}>{mode === 'encrypt' ? 'Encrypt' : 'Decrypt'}</button>
-      <button className="reset-button" onClick={handleReset}>Reset</button>
+      <button onClick={handleReset}>Reset</button>
       {result && (
         <div className="result-text">
+          <p>{mode === 'encrypt' ? 'Encrypted Text:' : 'Decrypted Text:'}</p>
           <p>{result}</p>
         </div>
       )}
-      <button onClick={handleModeSwitch}>
+      <button onClick={() => setMode(mode === 'encrypt' ? 'decrypt' : 'encrypt')}>
         Switch to {mode === 'encrypt' ? 'Decrypt' : 'Encrypt'}
       </button>
     </div>

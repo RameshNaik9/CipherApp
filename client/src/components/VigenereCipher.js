@@ -7,20 +7,35 @@ function VigenereCipher() {
     const [result, setResult] = useState('');
     const [mode, setMode] = useState('encrypt');
 
-    const handleEncrypt = () => {
-        setResult('Encrypted text will go here');
-    };
+    const handleAction = async () => {
+        const url = `http://localhost:5000/vigenere-${mode}`;
+        const dataToSend = { text, key };
 
-    const handleDecrypt = () => {
-        setResult('Decrypted text will go here');
-    };
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            });
 
-    const handleAction = () => {
-        if (mode === 'encrypt') {
-            handleEncrypt();
-        } else {
-            handleDecrypt();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setResult(data.cipherText || data.plainText);
+        } catch (error) {
+            console.error('Error during the encryption/decryption process:', error);
+            setResult('');
         }
+    };
+
+    const handleReset = () => {
+        setText('');
+        setKey('');
+        setResult('');
     };
 
     const handleModeSwitch = () => {
@@ -30,12 +45,12 @@ function VigenereCipher() {
 
     return (
         <div className="cipher-container">
-            <h2>Vigenere Cipher</h2>
+            <h2>{mode === 'encrypt' ? 'Vigenere Encryption' : 'Vigenere Decryption'}</h2>
             <input
                 type="text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Enter text"
+                placeholder={mode === 'encrypt' ? 'Enter plain text' : 'Enter cipher text'}
             />
             <input
                 type="text"
@@ -46,7 +61,7 @@ function VigenereCipher() {
             <button onClick={handleAction}>
                 {mode === 'encrypt' ? 'Encrypt' : 'Decrypt'}
             </button>
-            <button className="reset-button" onClick={() => setText('')}>
+            <button className="reset-button" onClick={handleReset}>
                 Reset
             </button>
             {result && (

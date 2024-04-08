@@ -2,20 +2,19 @@ const express = require('express');
 const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
+require('dotenv').config();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-
 const SECRET_KEY = Buffer.from(process.env.SECRET_KEY, 'hex');
 const IV_LENGTH = parseInt(process.env.IV_LENGTH, 10);
 
-
+//Encryption 
 function encrypt(text) {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv('aes-256-cbc', SECRET_KEY, iv);
@@ -24,6 +23,7 @@ function encrypt(text) {
   return iv.toString('hex') + ':' + encrypted;
 }
 
+//Decryption
 function decrypt(text) {
   const textParts = text.split(':');
   const iv = Buffer.from(textParts.shift(), 'hex');
@@ -92,7 +92,7 @@ app.post('/rsa-decrypt', (req, res) => {
 });
 
 
-
+//SHA 256
 app.post('/sha256', (req, res) => {
   const { text } = req.body;
   const hash = crypto.createHash('sha256').update(text).digest('hex');
@@ -258,55 +258,183 @@ function caesarCipher(str, amount) {
 // Endpoint for Caesar Cipher Encryption
 app.post('/caesar-encrypt', (req, res) => {
     const { text, shift } = req.body;
-    const encryptedText = caesarCipher(text, parseInt(shift));
+    const encryptedText = caesarCipher(text, shift);
     res.json({ cipherText: encryptedText });
 });
 
 // Endpoint for Caesar Cipher Decryption
 app.post('/caesar-decrypt', (req, res) => {
-    const { cipherText, shift } = req.body;
-    const decryptedText = caesarCipher(cipherText, -parseInt(shift));
+    const { text, shift } = req.body;
+    const decryptedText = caesarCipher(text, -shift);
     res.json({ plainText: decryptedText });
 });
 
-// Placeholder for Playfair Cipher logic
+function generateKeySquare(key) {
+    const keySquare = [];
+    const temp = [];
+    const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
+    let currentKey = key.toUpperCase().replace(/J/g, 'I').replace(/\s/g, '');
+    
+    // Add unique characters from key
+    for (const char of currentKey) {
+        if (!temp.includes(char)) {
+            temp.push(char);
+        }
+    }
+
+    // Add remaining letters of the alphabet
+    for (const char of alphabet) {
+        if (!temp.includes(char)) {
+            temp.push(char);
+        }
+    }
+
+    // Create the 5x5 key square
+    while (temp.length) {
+        keySquare.push(temp.splice(0, 5));
+    }
+
+    return keySquare;
+}
+
+function findPosition(keySquare, char) {
+    for (let row = 0; row < keySquare.length; row++) {
+        for (let col = 0; col < keySquare[row].length; col++) {
+            if (keySquare[row][col] === char) {
+                return { row, col };
+            }
+        }
+    }
+    return { row: -1, col: -1 };
+}
+
 function playfairEncrypt(text, key) {
-    return text; 
+    const keySquare = generateKeySquare(key);
+    let encryptedText = '';
+    text = text.toUpperCase().replace(/J/g, 'I').replace(/\s/g, '');
+
+    // Split text into pairs and encrypt
+    for (let i = 0; i < text.length; i += 2) {
+        let pair = text[i];
+        if (i + 1 < text.length) {
+            pair += text[i + 1] === text[i] ? 'X' : text[i + 1];
+        } else {
+            pair += 'X';
+        }
+
+        const pos1 = findPosition(keySquare, pair[0]);
+        const pos2 = findPosition(keySquare, pair[1]);
+
+        if (pos1.row === pos2.row) {
+            // Same row
+            encryptedText += keySquare[pos1.row][(pos1.col + 1) % 5];
+            encryptedText += keySquare[pos2.row][(pos2.col + 1) % 5];
+        } else if (pos1.col === pos2.col) {
+            // Same column
+            encryptedText += keySquare[(pos1.row + 1) % 5][pos1.col];
+            encryptedText += keySquare[(pos2.row + 1) % 5][pos2.col];
+        } else {
+            // Rectangle
+            encryptedText += keySquare[pos1.row][pos2.col];
+            encryptedText += keySquare[pos2.row][pos1.col];
+        }
+    }
+
+    return encryptedText;
 }
 
 function playfairDecrypt(cipherText, key) {
-    return cipherText;
+    const keySquare = generateKeySquare(key);
+    let decryptedText = '';
+    cipherText = cipherText.toUpperCase().replace(/\s/g, '');
+
+    // Split cipher text into pairs and decrypt
+    for (let i = 0; i < cipherText.length; i += 2) {
+        const pair = cipherText.substr(i, 2);
+        const pos1 = findPosition(keySquare, pair[0]);
+        const pos2 = findPosition(keySquare, pair[1]);
+
+        if (pos1.row === pos2.row) {
+            // Same row
+            decryptedText += keySquare[pos1.row][(pos1.col + 4) % 5]; // 4 is equivalent to -1 mod 5
+            decryptedText += keySquare[pos2.row][(pos2.col + 4) % 5];
+        } else if (pos1.col === pos2.col) {
+            // Same column
+            decryptedText += keySquare[(pos1.row + 4) % 5][pos1.col];
+            decryptedText += keySquare[(pos2.row + 4) % 5][pos2.col];
+        } else {
+            // Rectangle
+            decryptedText += keySquare[pos1.row][pos2.col];
+            decryptedText += keySquare[pos2.row][pos1.col];
+        }
+    }
+
+    return decryptedText;
 }
 
-// Placeholder for Vigenère Cipher logic
-function vigenereEncrypt(text, key) {
-    return text;
-}
-
-function vigenereDecrypt(cipherText, key) {
-    return cipherText; 
-}
-
-// Express endpoints for Playfair Cipher
+// Endpoint for Playfair Cipher Encryption
 app.post('/playfair-encrypt', (req, res) => {
     const { text, key } = req.body;
-    res.json({ cipherText: playfairEncrypt(text, key) });
+    const encryptedText = playfairEncrypt(text, key);
+    res.json({ cipherText: encryptedText });
 });
 
+// Endpoint for Playfair Cipher Decryption
 app.post('/playfair-decrypt', (req, res) => {
-    const { cipherText, key } = req.body;
-    res.json({ plainText: playfairDecrypt(cipherText, key) });
+    const { text, key } = req.body;
+    const decryptedText = playfairDecrypt(text, key);
+    res.json({ plainText: decryptedText });
 });
 
-// Express endpoints for Vigenère Cipher
+// Vigenère Cipher Helper Functions
+function vigenereEncrypt(text, key) {
+    let encryptedText = '';
+    for (let i = 0, j = 0; i < text.length; i++) {
+        const char = text.charAt(i);
+        if (char.match(/[a-z]/i)) {
+            const upper = char === char.toUpperCase();
+            let code = text.charCodeAt(i) - (upper ? 65 : 97);
+            let shift = key.charCodeAt(j % key.length) - 65;
+            code = (code + shift) % 26;
+            encryptedText += String.fromCharCode(code + (upper ? 65 : 97));
+            j++;
+        } else {
+            encryptedText += char;
+        }
+    }
+    return encryptedText;
+}
+
+function vigenereDecrypt(text, key) {
+    let decryptedText = '';
+    for (let i = 0, j = 0; i < text.length; i++) {
+        const char = text.charAt(i);
+        if (char.match(/[a-z]/i)) {
+            const upper = char === char.toUpperCase();
+            let code = text.charCodeAt(i) - (upper ? 65 : 97);
+            let shift = key.charCodeAt(j % key.length) - 65;
+            code = (code - shift + 26) % 26;
+            decryptedText += String.fromCharCode(code + (upper ? 65 : 97));
+            j++;
+        } else {
+            decryptedText += char;
+        }
+    }
+    return decryptedText;
+}
+
+// Endpoint for Vigenère Cipher Encryption
 app.post('/vigenere-encrypt', (req, res) => {
     const { text, key } = req.body;
-    res.json({ cipherText: vigenereEncrypt(text, key) });
+    const encryptedText = vigenereEncrypt(text, key);
+    res.json({ cipherText: encryptedText });
 });
 
+// Endpoint for Vigenère Cipher Decryption
 app.post('/vigenere-decrypt', (req, res) => {
-    const { cipherText, key } = req.body;
-    res.json({ plainText: vigenereDecrypt(cipherText, key) });
+    const { text, key } = req.body;
+    const decryptedText = vigenereDecrypt(text, key);
+    res.json({ plainText: decryptedText });
 });
 
 
