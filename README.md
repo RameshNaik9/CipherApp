@@ -2,7 +2,7 @@
 
 ## Hosted Domain
 
-The application is hosted at: [https://my-cipher-application.vercel.app/](https://my-cipher-application.vercel.app/)
+The application is hosted at: [https://my-cipher-app.vercel.app/)
 
 ## Access Information
 
